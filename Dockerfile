@@ -9,7 +9,7 @@ RUN npm install
 COPY . .
 COPY production.json /app/config/
 
-ENV NODE_ENV=production
+ENV NODE_ENV=productionпше
 
 ENV PORT=3030
 
