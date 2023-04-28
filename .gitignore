@@ -1,0 +1,9 @@
+.vscode
+.idea
+node_modules
+config/prodaction.json
+config/default.json
+.env
+db.js
+index.js
+models.js
