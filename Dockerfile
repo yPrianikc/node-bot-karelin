@@ -7,7 +7,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-COPY production.json /app/config/
+COPY ./config/production.json /app/config/
 
 ENV NODE_ENV=productionпше
 
