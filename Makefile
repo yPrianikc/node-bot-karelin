@@ -1,5 +1,5 @@
 build:
-	docker build -t node-bot-karelin .
+	docker build -t karelin .
 
 run:
-	docker run -d -p 3030:3030 --name node-bot-karelin --rm node-bot-karelin
+	docker run -d -p 3030:3030 --name karelin --rm karelin
