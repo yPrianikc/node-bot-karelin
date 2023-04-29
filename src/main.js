@@ -25,18 +25,16 @@ const INITIAL_SESSION = {
 const bot = new Telegraf(config.get('TELEGRAM_TOKEN'));
 
 bot.use(session());
-bot.session = {
-    messages: []
-};
 
 bot.telegram.setMyCommands([{ command: '/new', description: 'Новый диалог.' }]);
 
 bot.command('new', async ctx => {
-    ctx.session.messages = [];
+    ctx.session = { messages: [] };
     await ctx.reply('Вы начали новый диалог...');
 });
 
 bot.command('start', async ctx => {
+    ctx.session = { messages: [] };
     await ctx.reply(
         'Здравствуйте, я умный помощник, я понимаю текстовые и голосовые сообщения, спросите меня о чем нибудь.'
     );
@@ -50,7 +48,7 @@ bot.action('start_over', async ctx => {
             null,
             code('Диалог сброшен')
         );
-        ctx.session.messages = [];
+        ctx.session = { messages: [] };
     } catch (error) {
         console.error(error);
     }
@@ -58,6 +56,7 @@ bot.action('start_over', async ctx => {
 
 bot.on(message('voice'), async ctx => {
     try {
+        ctx.session ??= { messages: [] };
         const link = await ctx.telegram.getFileLink(ctx.message.voice.file_id);
         const user_id = String(ctx.message.from.id);
         const oggPath = await ogg.create(link.href, user_id);
@@ -73,9 +72,11 @@ bot.on(message('voice'), async ctx => {
 
 bot.on(message('text'), async ctx => {
     try {
+        ctx.session ??= { messages: [] };
         const user_id = String(ctx.message.from.id);
         const text = ctx.message.text;
         ctx.session.messages.push({ role: openai.roles.USER, content: text });
+        console.log(ctx.session);
         await openaiChatResponseHandler(ctx);
     } catch (e) {
         console.log('Ошибка при обработке текстового сообщения', e.message);
