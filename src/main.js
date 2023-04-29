@@ -25,23 +25,24 @@ const INITIAL_SESSION = {
 const bot = new Telegraf(config.get('TELEGRAM_TOKEN'));
 
 bot.use(session());
+bot.session = {
+    messages: []
+};
 
 bot.telegram.setMyCommands([{ command: '/new', description: 'Новый диалог.' }]);
 
 bot.command('new', async ctx => {
-    ctx.session ??= INITIAL_SESSION;
+    ctx.session.messages = [];
     await ctx.reply('Вы начали новый диалог...');
 });
 
 bot.command('start', async ctx => {
-    ctx.session ??= INITIAL_SESSION;
     await ctx.reply(
         'Здравствуйте, я умный помощник, я понимаю текстовые и голосовые сообщения, спросите меня о чем нибудь.'
     );
 });
 
 bot.action('start_over', async ctx => {
-    ctx.session ??= INITIAL_SESSION;
     try {
         await ctx.telegram.editMessageText(
             ctx.chat.id,
@@ -49,13 +50,13 @@ bot.action('start_over', async ctx => {
             null,
             code('Диалог сброшен')
         );
+        ctx.session.messages = [];
     } catch (error) {
         console.error(error);
     }
 });
 
 bot.on(message('voice'), async ctx => {
-    ctx.session ??= INITIAL_SESSION;
     try {
         const link = await ctx.telegram.getFileLink(ctx.message.voice.file_id);
         const user_id = String(ctx.message.from.id);
@@ -71,7 +72,6 @@ bot.on(message('voice'), async ctx => {
 });
 
 bot.on(message('text'), async ctx => {
-    ctx.session ??= INITIAL_SESSION;
     try {
         const user_id = String(ctx.message.from.id);
         const text = ctx.message.text;
